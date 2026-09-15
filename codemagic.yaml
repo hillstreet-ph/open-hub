@@ -1,0 +1,29 @@
+# Codemagic CI/CD — Open-Hub
+# Stack: Open WebUI — SvelteKit + Vite frontend (Node 22), Python backend.
+# Build & validate only. Production deploy stays on the existing platform
+# (Dockerfile / Railway / Zeabur) — no competing deployer here.
+# Mirrors the GitHub Actions frontend build (node 22 → npm ci → npm run build).
+
+workflows:
+  open-hub-web:
+    name: Open-Hub Web Build & Validate
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      node: 22
+    triggering:
+      events:
+        - push
+        - pull_request
+      cancel_previous_builds: true
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Build frontend
+        script: npm run build
+    artifacts:
+      - build/**
